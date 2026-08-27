@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel admin — Game Over Tech</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<style>
+  body{ padding: 40px 20px 100px; }
+  .admin-wrap{ max-width: 900px; margin: 0 auto; }
+  .admin-box{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px;
+    margin-bottom: 26px;
+  }
+  .admin-box h2{ font-family: var(--display); font-size: 1.2rem; margin-bottom: 18px; }
+  .field{ margin-bottom: 16px; }
+  .field label{ display:block; font-size: .82rem; color: var(--text-muted); margin-bottom: 6px; }
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="password"],
+  .field input[type="number"],
+  .field select{
+    width: 100%;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: var(--body);
+    font-size: .92rem;
+  }
+  .field input[type="file"]{ color: var(--text-muted); font-size: .85rem; }
+  .field-row{ display:flex; gap: 14px; flex-wrap: wrap; }
+  .field-row .field{ flex: 1; min-width: 160px; }
+  .checkbox-row{ display:flex; align-items:center; gap:8px; margin-bottom: 16px; }
+  .admin-msg{ font-size: .85rem; margin-top: 10px; }
+  .admin-msg.error{ color: #ff9c92; }
+  .admin-msg.ok{ color: var(--accent); }
+  .admin-table{ width:100%; border-collapse: collapse; font-size: .88rem; }
+  .admin-table th{ text-align:left; color: var(--text-muted); font-family: var(--mono); font-size: .74rem; padding: 8px; border-bottom: 1px solid var(--line); }
+  .admin-table td{ padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .admin-table img{ width: 46px; height: 46px; object-fit: cover; border-radius: 6px; }
+  .admin-table .actions{ display:flex; gap: 8px; }
+  .admin-table .actions button{
+    background: none; border: 1px solid var(--line); color: var(--text-muted);
+    padding: 6px 10px; border-radius: 6px; font-size: .78rem; cursor: pointer;
+  }
+  .admin-table .actions button:hover{ border-color: var(--accent); color: var(--accent); }
+  .admin-table .actions button.danger:hover{ border-color: #ff6b5e; color: #ff9c92; }
+  .badge-out{ color: #ff9c92; font-family: var(--mono); font-size: .72rem; }
+  .badge-ok{ color: var(--accent); font-family: var(--mono); font-size: .72rem; }
+  #loginBox{ max-width: 380px; margin: 80px auto 0; }
+  #appBox{ display:none; }
+  .top-bar{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; }
+  .top-bar h1{ font-family: var(--display); font-size: 1.3rem; }
+  .logout-btn{ background:none; border: 1px solid var(--line); color: var(--text-muted); padding: 8px 14px; border-radius: 8px; font-size: .82rem; cursor:pointer; }
+  .logout-btn:hover{ border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="admin-wrap">
+
+  <!-- ============ LOGIN ============ -->
+  <div class="admin-box" id="loginBox">
+    <h2>Panel admin — Game Over Tech</h2>
+    <form id="loginForm">
+      <div class="field">
+        <label>Correo</label>
+        <input type="email" id="loginEmail" required>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="loginPassword" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Entrar</button>
+      <p class="admin-msg error" id="loginMsg"></p>
+    </form>
+  </div>
+
+  <!-- ============ APP (tras login) ============ -->
+  <div id="appBox">
+    <div class="top-bar">
+      <h1>Panel admin — Game Over Tech</h1>
+      <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+    </div>
+
+    <div class="admin-box">
+      <h2 id="formTitle">Agregar producto nuevo</h2>
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <div class="field">
+          <label>Nombre del producto</label>
+          <input type="text" id="fName" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Categoría</label>
+            <select id="fCategory" required>
+              <option value="cargadores">Cargadores</option>
+              <option value="cables">Cables</option>
+              <option value="audifonos">Audífonos</option>
+              <option value="teclados">Teclados</option>
+              <option value="mouse">Mouse</option>
+              <option value="switch">Nintendo Switch</option>
+              <option value="accesorios">Otros accesorios</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Precio (ej: $10.000 o Desde $10.000)</label>
+            <input type="text" id="fPrice" required>
+          </div>
+          <div class="field">
+            <label>Orden (menor número = aparece primero)</label>
+            <input type="number" id="fOrder" value="99">
+          </div>
+        </div>
+        <div class="field">
+          <label>Foto del producto</label>
+          <input type="file" id="fImage" accept="image/*">
+          <p style="font-size:.78rem; color:var(--text-muted); margin-top:6px;">Si estás editando y no subes una foto nueva, se mantiene la actual.</p>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="fInStock" checked>
+          <label for="fInStock" style="margin:0;">Disponible (desmarca para mostrar "Agotado")</label>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Guardar producto</button>
+        <button type="button" class="btn btn-ghost" id="cancelEditBtn" style="display:none;">Cancelar edición</button>
+        <p class="admin-msg" id="formMsg"></p>
+      </form>
+    </div>
+
+    <div class="admin-box">
+      <h2>Catálogo actual</h2>
+      <table class="admin-table">
+        <thead>
+          <tr><th>Foto</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Orden</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="productTableBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/supabase-config.js"></script>
+<script>
+const loginBox = document.getElementById('loginBox');
+const appBox = document.getElementById('appBox');
+const loginForm = document.getElementById('loginForm');
+const loginMsg = document.getElementById('loginMsg');
+const logoutBtn = document.getElementById('logoutBtn');
+
+const productForm = document.getElementById('productForm');
+const productTableBody = document.getElementById('productTableBody');
+const formMsg = document.getElementById('formMsg');
+const formTitle = document.getElementById('formTitle');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+const submitBtn = document.getElementById('submitBtn');
+
+const CATEGORY_LABELS = {
+  cargadores: 'Cargadores', cables: 'Cables', audifonos: 'Audífonos',
+  teclados: 'Teclados', mouse: 'Mouse', switch: 'Nintendo Switch', accesorios: 'Otros accesorios'
+};
+
+// ============ Sesión ============
+async function checkSession(){
+  const { data } = await supabaseClient.auth.getSession();
+  if(data.session){
+    loginBox.style.display = 'none';
+    appBox.style.display = 'block';
+    loadProducts();
+  }else{
+    loginBox.style.display = 'block';
+    appBox.style.display = 'none';
+  }
+}
+checkSession();
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginMsg.textContent = '';
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error){
+    loginMsg.textContent = 'No se pudo iniciar sesión: ' + error.message;
+  }else{
+    checkSession();
+  }
+});
+
+logoutBtn.addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  checkSession();
+});
+
+// ============ Cargar tabla de productos ============
+async function loadProducts(){
+  const { data, error } = await supabaseClient.from('products').select('*').order('sort_order', { ascending: true });
+  if(error){
+    productTableBody.innerHTML = `<tr><td colspan="7">Error cargando productos: ${error.message}</td></tr>`;
+    return;
+  }
+  productTableBody.innerHTML = data.map(p => `
+    <tr>
+      <td><img src="${p.image_url}" alt=""></td>
+      <td>${p.name}</td>
+      <td>${CATEGORY_LABELS[p.category] || p.category}</td>
+      <td>${p.price}</td>
+      <td>${p.in_stock ? '<span class="badge-ok">Disponible</span>' : '<span class="badge-out">Agotado</span>'}</td>
+      <td>${p.sort_order}</td>
+      <td class="actions">
+        <button data-id="${p.id}" class="edit-btn">Editar</button>
+        <button data-id="${p.id}" class="danger delete-btn">Eliminar</button>
+      </td>
+    </tr>
+  `).join('');
+
+  productTableBody.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => startEdit(btn.dataset.id, data));
+  });
+  productTableBody.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteProduct(btn.dataset.id, data));
+  });
+}
+
+// ============ Editar ============
+function startEdit(id, allProducts){
+  const p = allProducts.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById('productId').value = p.id;
+  document.getElementById('fName').value = p.name;
+  document.getElementById('fCategory').value = p.category;
+  document.getElementById('fPrice').value = p.price;
+  document.getElementById('fOrder').value = p.sort_order;
+  document.getElementById('fInStock').checked = p.in_stock;
+  formTitle.textContent = 'Editando: ' + p.name;
+  submitBtn.textContent = 'Guardar cambios';
+  cancelEditBtn.style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+cancelEditBtn.addEventListener('click', () => {
+  productForm.reset();
+  document.getElementById('productId').value = '';
+  formTitle.textContent = 'Agregar producto nuevo';
+  submitBtn.textContent = 'Guardar producto';
+  cancelEditBtn.style.display = 'none';
+});
+
+// ============ Utilidad: extraer el nombre de archivo desde la URL pública ============
+function storageFileNameFromUrl(url){
+  try{
+    const marker = '/product-images/';
+    const idx = url.indexOf(marker);
+    if(idx === -1) return null;
+    return url.slice(idx + marker.length);
+  }catch(e){ return null; }
+}
+
+// ============ Eliminar ============
+async function deleteProduct(id, allProducts){
+  if(!confirm('¿Seguro que quieres eliminar este producto? No se puede deshacer.')) return;
+  const product = allProducts.find(x => x.id === id);
+
+  const { error } = await supabaseClient.from('products').delete().eq('id', id);
+  if(error){ alert('Error al eliminar: ' + error.message); return; }
+
+  // limpia la foto asociada en Storage (si la URL es de nuestro bucket)
+  if(product){
+    const fileName = storageFileNameFromUrl(product.image_url);
+    if(fileName){
+      await supabaseClient.storage.from('product-images').remove([fileName]);
+    }
+  }
+
+  loadProducts();
+}
+
+// ============ Guardar (crear o editar) ============
+productForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  formMsg.className = 'admin-msg';
+  formMsg.textContent = 'Guardando...';
+  submitBtn.disabled = true;
+
+  try{
+    const id = document.getElementById('productId').value;
+    const name = document.getElementById('fName').value.trim();
+    const category = document.getElementById('fCategory').value;
+    const price = document.getElementById('fPrice').value.trim();
+    const sort_order = parseInt(document.getElementById('fOrder').value, 10) || 99;
+    const in_stock = document.getElementById('fInStock').checked;
+    const fileInput = document.getElementById('fImage');
+    const file = fileInput.files[0];
+
+    let image_url = null;
+
+    if(file){
+      const ext = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from('product-images')
+        .upload(fileName, file);
+      if(uploadError) throw uploadError;
+      const { data: publicData } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
+      image_url = publicData.publicUrl;
+    }
+
+    if(id){
+      // editar
+      const updateObj = { name, category, price, sort_order, in_stock };
+      if(image_url){
+        // borra la foto anterior del bucket antes de reemplazarla en la fila
+        const { data: current } = await supabaseClient.from('products').select('image_url').eq('id', id).single();
+        updateObj.image_url = image_url;
+        if(current){
+          const oldFileName = storageFileNameFromUrl(current.image_url);
+          if(oldFileName) await supabaseClient.storage.from('product-images').remove([oldFileName]);
+        }
+      }
+      const { error } = await supabaseClient.from('products').update(updateObj).eq('id', id);
+      if(error) throw error;
+    }else{
+      // crear
+      if(!image_url) throw new Error('Debes subir una foto para un producto nuevo.');
+      const { error } = await supabaseClient.from('products').insert({
+        name, category, price, sort_order, in_stock, image_url
+      });
+      if(error) throw error;
+    }
+
+    formMsg.className = 'admin-msg ok';
+    formMsg.textContent = '✓ Guardado correctamente.';
+    productForm.reset();
+    document.getElementById('productId').value = '';
+    formTitle.textContent = 'Agregar producto nuevo';
+    submitBtn.textContent = 'Guardar producto';
+    cancelEditBtn.style.display = 'none';
+    loadProducts();
+
+  }catch(err){
+    formMsg.className = 'admin-msg error';
+    formMsg.textContent = 'Error: ' + err.message;
+  }finally{
+    submitBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
